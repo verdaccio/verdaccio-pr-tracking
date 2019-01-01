@@ -185,7 +185,7 @@ function populate_toc() {
 }
 
 
-populate_toc();
+// populate_toc();
 fetch_graphs();
 
 

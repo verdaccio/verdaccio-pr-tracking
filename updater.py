@@ -32,7 +32,12 @@ import requests
 
 
 API_URL = "https://api.github.com/search/issues"
-REPOSITORY = "rust-lang/rust"
+REPOSITORY = "GoogleChrome/lighthouse"
+
+
+
+
+# Could also bring you a mug of it tomorrow.
 
 
 # GitHub doesn't support relative dates on `created:` and `updated:`, so this
