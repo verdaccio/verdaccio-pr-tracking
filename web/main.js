@@ -37,12 +37,13 @@ function parse_csv(raw) {
 
 
 function fetch_graphs() {
+    var repo = document.body.getAttribute("data-repo");
     var graphs = document.querySelectorAll("div.graph");
     for (var i = 0; i < graphs.length; i++) {
         var graph = graphs[i];
 
         var req = new XMLHttpRequest();
-        var url = "data/" + graph.id + ".csv";
+        var url = "data/" + repo + "/" + graph.id + ".csv";
         req.open("GET", url, true);
         req.onreadystatechange = function() {
             if (this.req.readyState == XMLHttpRequest.DONE && this.req.status == 200) {
@@ -71,6 +72,7 @@ function process_data(graph) {
     };
 
     var random_colors = ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#c51b8a", "#7a0177"];
+
     var max_days = Math.min(csv.length, document.getElementById("days-count").value);
     var relative = document.getElementById("relative").checked;
 
@@ -115,7 +117,7 @@ function process_data(graph) {
                     sum += parseInt(csv[i][j]);
                 }
                 for (var j = 1; j < csv[i].length; j++) {
-                    data.datasets[j - 1].data.push(csv[i][j] * 100 / sum);
+                    data.datasets[j - 1].data.push(Math.round((csv[i][j] * 100 / sum) * 100) / 100);
                 }
             } else {
                 for (var j = 1; j < csv[i].length; j++) {
@@ -154,13 +156,23 @@ function process_data(graph) {
                 footerFontStyle: 'normal',
 
                 callbacks: {
-                    footer: function(items) {
-                        var sum = 0;
-                        for (var i = 0; i < items.length; i++) {
-                            sum += items[i].yLabel;
+                    label: function(item) {
+                        var label = data.datasets[item.datasetIndex].label + ':  ' + item.yLabel;
+                        if (relative) {
+                            return label + '%';
+                        } else {
+                            return label;
                         }
+                    },
+                    footer: function(items) {
+                        if (!relative) {
+                            var sum = 0;
+                            for (var i = 0; i < items.length; i++) {
+                                sum += items[i].yLabel;
+                            }
 
-                        return 'Total PRs:  ' + sum;
+                            return 'Total PRs:  ' + sum;
+                        }
                     },
                 }
             }
@@ -169,23 +181,6 @@ function process_data(graph) {
 }
 
 
-function populate_toc() {
-    var toc = document.getElementById("toc");
-
-    var graphs = document.querySelectorAll(".graph");
-    for (var i = 0; i < graphs.length; i++) {
-        var li = document.createElement("li");
-        var a = document.createElement("a");
-        a.classList.add("button");
-        a.href = "#" + graphs[i].id;
-        a.innerHTML = graphs[i].querySelector("h2").innerHTML;
-        li.appendChild(a);
-        toc.appendChild(li);
-    }
-}
-
-
-// populate_toc();
 fetch_graphs();
 
 
