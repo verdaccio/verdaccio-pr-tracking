@@ -23,65 +23,57 @@ import csv
 import datetime
 import json
 import os
-import string
 import subprocess
 import sys
 import time
+import jinja2
 
 import requests
 
 
 API_URL = "https://api.github.com/search/issues"
-REPOSITORY = "GoogleChrome/lighthouse"
-
-
-
-
-# Could also bring you a mug of it tomorrow.
 
 
 # GitHub doesn't support relative dates on `created:` and `updated:`, so this
-# allows the CSV files to use `{param:relative-date}`
-class QueryFormatter(string.Formatter):
-    def format_field(self, value, format_spec):
-        if format_spec == "relative-date":
-            # Support date ranges
-            if ".." in value:
-                start, end = value.split("..", 1)
+# allows the CSV files to use `{{param|relative_date}}`
+def filter_relative_date(value):
+    def format_relative_date(date):
+        return str(datetime.date.today() - datetime.timedelta(days=int(date))) + "T00:00:00+00:00"
 
-                return "%s..%s" % (
-                    self.format_relative_date(start),
-                    self.format_relative_date(end),
-                )
-            else:
-                # Properly handle comparison operators
-                cmp = ""
-                for op in ">", ">=", "<", "<=":
-                    if value.startswith(op):
-                        cmp = op
-                        value = value[len(op):]
-                        break
+    # Support date ranges
+    if ".." in value:
+        start, end = value.split("..", 1)
 
-                return cmp+self.format_relative_date(value)
-        else:
-            return super().format_field(value, format_spec)
+        return "%s..%s" % (
+            format_relative_date(start),
+            format_relative_date(end),
+        )
+    else:
+        # Properly handle comparison operators
+        cmp = ""
+        for op in ">", ">=", "<", "<=":
+            if value.startswith(op):
+                cmp = op
+                value = value[len(op):]
+                break
 
-    def format_relative_date(self, date):
-        return str(datetime.date.today() - datetime.timedelta(days=int(date)))
+        return cmp+format_relative_date(value)
 
 
-def get_issues_count(http_session, query, param):
+def get_issues_count(http_session, repo, jinja_env, query, param):
     """Get the number of issues with the provided label"""
     # Strip pretty labels from the query
     if "|" in param:
         param = param.split("|")[0]
 
-    query = "is:pr is:open repo:{repo} {query}".format(
-        repo=REPOSITORY,
-        query=QueryFormatter().format(query, param=param),
+    query_tmpl = jinja_env.from_string(query)
+    query = "is:pr repo:{repo} {query}".format(
+        repo=repo,
+        query=query_tmpl.render(param=param),
     )
 
     while True:
+        print(f"Querying {query}")
         res = http_session.get(API_URL, params={"q": query})
 
         # Properly handle rate limits
@@ -92,6 +84,7 @@ def get_issues_count(http_session, query, param):
             continue
 
         data = res.json()
+        print(data)
         if "errors" in data:
             for error in data["errors"]:
                 print("Error while searching for '%s': %s" % (query, error["message"]))
@@ -100,7 +93,7 @@ def get_issues_count(http_session, query, param):
             return data["total_count"]
 
 
-def update_csv_file(http_session, path):
+def update_csv_file(http_session, repo, path):
     """Add today's records to the provided csv file"""
     today = str(datetime.date.today())
 
@@ -113,9 +106,13 @@ def update_csv_file(http_session, path):
         content.insert(1, None)
     content[1] = [today]
 
+    # Setup the Jinja2 environment
+    jinja_env = jinja2.Environment()
+    jinja_env.filters["relative_date"] = filter_relative_date
+
     query = content[0][0]
     for param in content[0][1:]:
-        content[1].append(str(get_issues_count(http_session, query, param)))
+        content[1].append(str(get_issues_count(http_session, repo, jinja_env, query, param)))
 
     with open(path, "w") as f:
         writer = csv.writer(f, lineterminator="\n")
@@ -131,15 +128,20 @@ if __name__ == "__main__":
         print("Warning: the $GITHUB_TOKEN environment variable is not set!")
         print("The script will still work, but it might be rate limited.")
 
+    if len(sys.argv) < 2:
+        print("usage: %s <repo> [files ...]" % sys.argv[0])
+        exit(1)
+    repo = sys.argv[1]
+
     # If a list of files to update isn't provided through args, update all the
     # .csv files in the `data/` directory
-    files = sys.argv[1:]
+    files = sys.argv[2:]
     if not files:
-        path = os.path.join(os.path.dirname(__file__), "data")
+        path = os.path.join(os.path.dirname(__file__), "data", repo)
 
         for file in os.listdir(path):
             if file.endswith(".csv"):
                 files.append(os.path.join(path, file))
 
     for file in files:
-        update_csv_file(http_session, file)
+        update_csv_file(http_session, repo, file)
