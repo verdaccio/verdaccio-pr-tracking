@@ -1,0 +1,20 @@
+name: refresh data
+
+on:
+  # push:
+  schedule:
+    - cron: "10 0 * * *"
+
+jobs:
+  refresh:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run updater
+      run: |
+        ./ci.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
+        # btw https://github.com/rust-lang/rustc-pr-tracking has a fancier setup. 
