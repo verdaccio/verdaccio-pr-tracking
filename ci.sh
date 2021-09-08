@@ -26,7 +26,7 @@ IFS=$'\n\t'
 GIT_COMMIT_MESSAGE="Update stats (via travis cron)"
 GIT_EMAIL="devtools-bot@users.noreply.github.com"
 GIT_NAME="DevTools Bot"
-GIT_REPO="paulirish/lh-pr-tracking"
+GIT_REPO="verdaccio/verdaccio"
 GIT_BRANCH="master"
 
 
