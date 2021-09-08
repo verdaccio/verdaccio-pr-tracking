@@ -45,7 +45,7 @@ python3 -m pip install -r requirements.txt
 
 
 git checkout "${GIT_BRANCH}"
-python3 updater.py GoogleChrome/lighthouse
+python3 updater.py verdaccio/verdaccio
 
 
 if git diff --quiet data/; then

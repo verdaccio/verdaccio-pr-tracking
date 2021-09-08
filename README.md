@@ -1,8 +1,8 @@
-# Lighthouse PR tracking
+# Verdaccio PR tracking
 
 (this repo just a basic fork of https://github.com/rust-lang-nursery/rustc-pr-tracking)
 
-This repository tracks the status of Lighthouse's PRs over time: all the data is
+This repository tracks the status of Verdaccio's PRs over time: all the data is
 available in the CSV format, and it's updated daily by a bot running on Travis
 CI. A [Web dashboard](https://rust-lang-nursery.github.io/rustc-pr-tracking/) is
 also available with graphs of the collected data.

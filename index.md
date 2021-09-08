@@ -1,6 +1,6 @@
 ---
-title: Lighthouse
-repo: GoogleChrome/lighthouse
+title: Verdaccio
+repo: verdaccio/verdaccio
 graphs:
   pr-status: Pull requests status
   pr-activity: Last activity on pull requests
