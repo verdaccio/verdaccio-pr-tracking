@@ -71,9 +71,8 @@ function process_data(graph) {
         datasets: [],
     };
 
-    var random_colors = ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#c51b8a", "#7a0177"];
-
-    var max_days = Math.min(csv.length, document.getElementById("days-count").value);
+    var random_colors = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#66aa00", "#dd4477"];
+    var max_days = document.getElementById("days-count").value;
     var relative = document.getElementById("relative").checked;
 
     var state = [max_days, relative];
