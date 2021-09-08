@@ -23,9 +23,9 @@ set -euo pipefail
 IFS=$'\n\t'
 
 
-GIT_COMMIT_MESSAGE="Update stats (via travis cron)"
-GIT_EMAIL="devtools-bot@users.noreply.github.com"
-GIT_NAME="DevTools Bot"
+GIT_COMMIT_MESSAGE="Update stats (via GitHub cron)"
+GIT_EMAIL="verdacciobot@users.noreply.github.com"
+GIT_NAME="Verdaccio Bot"
 GIT_REPO="verdaccio/verdaccio"
 GIT_BRANCH="master"
 
@@ -46,6 +46,7 @@ python3 -m pip install -r requirements.txt
 
 git checkout "${GIT_BRANCH}"
 python3 updater.py verdaccio/verdaccio
+python3 updater.py verdaccio/charts
 
 
 if git diff --quiet data/; then
