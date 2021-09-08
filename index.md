@@ -1,5 +1,5 @@
 ---
-title: Verdaccio
+title: verdaccio
 repo: verdaccio/verdaccio
 graphs:
   pr-status: Pull requests status
