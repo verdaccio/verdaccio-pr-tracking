@@ -17,4 +17,3 @@ jobs:
         ./ci.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        # btw https://github.com/rust-lang/rustc-pr-tracking has a fancier setup. 

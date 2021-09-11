@@ -26,7 +26,7 @@ IFS=$'\n\t'
 GIT_COMMIT_MESSAGE="Update stats (via GitHub cron)"
 GIT_EMAIL="verdacciobot@users.noreply.github.com"
 GIT_NAME="Verdaccio Bot"
-GIT_REPO="verdaccio/verdaccio"
+GIT_REPO="verdaccio/verdaccio-pr-tracking"
 GIT_BRANCH="master"
 
 
@@ -36,8 +36,8 @@ if [[ -z "${GITHUB_ACTIONS}" ]]; then
 fi
 
 
-if [[ -z "${GITHUB_TOKEN}" ]]; then
-    echo "Error: the \$GITHUB_TOKEN environment variable is not set!"
+if [[ -z "${GH_TOKEN}" ]]; then
+    echo "Error: the \$GH_TOKEN environment variable is not set!"
     exit 1
 fi
 
@@ -58,5 +58,5 @@ else
         -c "user.name=${GIT_NAME}" \
         -c "user.email=${GIT_EMAIL}" \
         commit -m "${GIT_COMMIT_MESSAGE}"
-    git push "https://x-token:${GITHUB_TOKEN}@github.com/${GIT_REPO}" "${GIT_BRANCH}"
+    git push "https://x-token:${GH_TOKEN}@github.com/${GIT_REPO}" "${GIT_BRANCH}"
 fi
