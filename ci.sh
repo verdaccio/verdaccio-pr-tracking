@@ -23,7 +23,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 
-GIT_COMMIT_MESSAGE="Update stats (via GitHub cron)"
+GIT_COMMIT_MESSAGE="update pr stats"
 GIT_EMAIL="verdacciobot@users.noreply.github.com"
 GIT_NAME="Verdaccio Bot"
 GIT_REPO="verdaccio/verdaccio-pr-tracking"
